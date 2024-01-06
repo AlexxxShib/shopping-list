@@ -20,18 +20,28 @@ class MainActivity : ComponentActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
 
+    private var shopListAdapter = ShopListAdapter()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setupRecyclerView()
+
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.shopList.observe(this) {
             Log.d("TEST", it.toString())
-            if (it.size > 0)
-            {
-                viewModel.deleteShopItem(it.first())
-            }
+
+            shopListAdapter.shopList = it
+        }
+    }
+
+    private fun setupRecyclerView() {
+        with(binding.shopList) {
+            adapter = shopListAdapter
+            recycledViewPool.setMaxRecycledViews(ShopListAdapter.VIEW_TYPE_ENABLED, ShopListAdapter.POOL_SIZE)
+            recycledViewPool.setMaxRecycledViews(ShopListAdapter.VIEW_TYPE_DISABLED, ShopListAdapter.POOL_SIZE)
         }
     }
 }
