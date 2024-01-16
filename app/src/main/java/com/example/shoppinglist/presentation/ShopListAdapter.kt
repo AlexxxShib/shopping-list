@@ -1,32 +1,21 @@
 package com.example.shoppinglist.presentation
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ListAdapter
 import com.example.shoppinglist.R
 import com.example.shoppinglist.domain.ShopItem
 
-class ShopListAdapter: RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>() {
-
-    inner class ShopItemViewHolder(view: View): RecyclerView.ViewHolder(view) {
-        val itemName = view.findViewById<TextView>(R.id.textViewItemName)
-        val itemCount = view.findViewById<TextView>(R.id.textViewItemCount)
-    }
+class ShopListAdapter: ListAdapter<ShopItem, ShopItemViewHolder>(ShopItemDiffCallback()) {
 
     companion object {
         const val VIEW_TYPE_ENABLED = 0
         const val VIEW_TYPE_DISABLED = 1
-
         const val POOL_SIZE = 15
     }
 
-    var shopList = listOf<ShopItem>()
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
+    var onShopItemClickListener: ((ShopItem) -> Unit)? = null
+    var onShopItemLongClickListener: ((ShopItem) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopItemViewHolder {
         val layout = when (viewType) {
@@ -40,19 +29,23 @@ class ShopListAdapter: RecyclerView.Adapter<ShopListAdapter.ShopItemViewHolder>(
         return ShopItemViewHolder(view)
     }
 
-    override fun getItemCount(): Int {
-        return shopList.count()
-    }
-
     override fun getItemViewType(position: Int): Int {
-        return if (shopList[position].enabled) VIEW_TYPE_ENABLED else VIEW_TYPE_DISABLED
+        return if (getItem(position).enabled) VIEW_TYPE_ENABLED else VIEW_TYPE_DISABLED
     }
 
     override fun onBindViewHolder(holder: ShopItemViewHolder, position: Int) {
-        val item = shopList[position]
+        val item = getItem(position)
         with(holder) {
             itemName.text = item.name
             itemCount.text = item.count.toString()
+
+            itemView.setOnClickListener {
+                onShopItemClickListener?.invoke(item)
+            }
+            itemView.setOnLongClickListener {
+                onShopItemLongClickListener?.invoke(item)
+                true
+            }
         }
     }
 }

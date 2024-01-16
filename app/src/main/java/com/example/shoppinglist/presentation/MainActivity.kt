@@ -3,17 +3,10 @@ package com.example.shoppinglist.presentation
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.example.shoppinglist.databinding.ActivityMainBinding
-import com.example.shoppinglist.ui.theme.ShoppingListTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -31,17 +24,52 @@ class MainActivity : ComponentActivity() {
 
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.shopList.observe(this) {
-            Log.d("TEST", it.toString())
-
-            shopListAdapter.shopList = it
+            shopListAdapter.submitList(it)
         }
     }
 
     private fun setupRecyclerView() {
         with(binding.shopList) {
             adapter = shopListAdapter
-            recycledViewPool.setMaxRecycledViews(ShopListAdapter.VIEW_TYPE_ENABLED, ShopListAdapter.POOL_SIZE)
-            recycledViewPool.setMaxRecycledViews(ShopListAdapter.VIEW_TYPE_DISABLED, ShopListAdapter.POOL_SIZE)
+            recycledViewPool.setMaxRecycledViews(
+                ShopListAdapter.VIEW_TYPE_ENABLED,
+                ShopListAdapter.POOL_SIZE
+            )
+            recycledViewPool.setMaxRecycledViews(
+                ShopListAdapter.VIEW_TYPE_DISABLED,
+                ShopListAdapter.POOL_SIZE
+            )
         }
+
+        setupListeners()
+    }
+
+    private fun setupListeners() {
+        shopListAdapter.onShopItemClickListener = {
+            Log.d("TEST", it.toString())
+        }
+        shopListAdapter.onShopItemLongClickListener = {
+            viewModel.changeEnableState(it)
+        }
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ) {
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.absoluteAdapterPosition
+                val shopItem = shopListAdapter.currentList[position]
+                viewModel.deleteShopItem(shopItem)
+            }
+
+        }).attachToRecyclerView(binding.shopList)
     }
 }
