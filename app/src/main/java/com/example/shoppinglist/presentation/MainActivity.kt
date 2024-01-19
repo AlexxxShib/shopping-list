@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.shoppinglist.R
 import com.example.shoppinglist.databinding.ActivityMainBinding
 
-class MainActivity : FragmentActivity() {
+class MainActivity : FragmentActivity(), ShopItemFragment.OnEditingFinishedListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
@@ -38,6 +38,10 @@ class MainActivity : FragmentActivity() {
                 startActivity(ShopItemActivity.newIntentAddItem(this))
             }
         }
+    }
+
+    override fun onEditingFinished() {
+        supportFragmentManager.popBackStack()
     }
 
     private fun launchFragment(fragment: Fragment) {

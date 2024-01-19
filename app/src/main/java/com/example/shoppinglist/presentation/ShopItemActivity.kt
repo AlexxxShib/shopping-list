@@ -3,15 +3,12 @@ package com.example.shoppinglist.presentation
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProvider
 import com.example.shoppinglist.R
 import com.example.shoppinglist.databinding.ActivityShopItemBinding
 import com.example.shoppinglist.domain.ShopItem
 
-class ShopItemActivity : FragmentActivity() {
+class ShopItemActivity : FragmentActivity(), ShopItemFragment.OnEditingFinishedListener {
 
     private lateinit var binding: ActivityShopItemBinding
 
@@ -28,6 +25,10 @@ class ShopItemActivity : FragmentActivity() {
         if (savedInstanceState == null) {
             launchFragment()
         }
+    }
+
+    override fun onEditingFinished() {
+        onBackPressedDispatcher.onBackPressed()
     }
 
     private fun launchFragment() {

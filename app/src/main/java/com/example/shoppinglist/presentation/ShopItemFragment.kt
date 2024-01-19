@@ -1,5 +1,6 @@
 package com.example.shoppinglist.presentation
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,9 +16,19 @@ class ShopItemFragment : Fragment() {
 
     private lateinit var binding: FragmentShopItemBinding
     private lateinit var viewModel: ShopItemViewModel
+    private lateinit var onEditingFinishedListener: OnEditingFinishedListener
 
     private var screenMode: String = MODE_UNKNOWN
     private var shopItemId: Int = ShopItem.UNDEFINED_ID
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnEditingFinishedListener) {
+            onEditingFinishedListener = context
+        } else {
+            throw RuntimeException("Activity must implement interface OnEditingFinishedListener")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +53,7 @@ class ShopItemFragment : Fragment() {
         }
         observeInputErrors()
         viewModel.shouldCloseScreen.observeForever {
-            activity?.onBackPressedDispatcher?.onBackPressed()
+            onEditingFinishedListener.onEditingFinished()
         }
     }
 
@@ -126,5 +137,9 @@ class ShopItemFragment : Fragment() {
                 }
             }
         }
+    }
+
+    interface OnEditingFinishedListener {
+        fun onEditingFinished()
     }
 }
