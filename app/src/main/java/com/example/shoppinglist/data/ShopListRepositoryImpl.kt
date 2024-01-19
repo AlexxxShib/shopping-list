@@ -15,10 +15,10 @@ object ShopListRepositoryImpl : ShopListRepository {
 
     init {
         // test data
-        for (i in 1..100) {
+        /*for (i in 1..100) {
             val item = ShopItem("Item $i", (1..10).random(), (1..3).random() == 1)
             addShopItem(item)
-        }
+        }*/
     }
 
     override fun addShopItem(shopItem: ShopItem) {

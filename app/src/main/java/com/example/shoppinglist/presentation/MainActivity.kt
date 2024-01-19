@@ -1,7 +1,6 @@
 package com.example.shoppinglist.presentation
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -26,6 +25,10 @@ class MainActivity : ComponentActivity() {
         viewModel.shopList.observe(this) {
             shopListAdapter.submitList(it)
         }
+
+        binding.buttonAddShopItem.setOnClickListener {
+            startActivity(ShopItemActivity.newIntentAddItem(this))
+        }
     }
 
     private fun setupRecyclerView() {
@@ -46,7 +49,7 @@ class MainActivity : ComponentActivity() {
 
     private fun setupListeners() {
         shopListAdapter.onShopItemClickListener = {
-            Log.d("TEST", it.toString())
+            startActivity(ShopItemActivity.newIntentEditItem(this, it.id))
         }
         shopListAdapter.onShopItemLongClickListener = {
             viewModel.changeEnableState(it)
