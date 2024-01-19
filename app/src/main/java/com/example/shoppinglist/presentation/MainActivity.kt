@@ -1,23 +1,28 @@
 package com.example.shoppinglist.presentation
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.example.shoppinglist.R
 import com.example.shoppinglist.databinding.ActivityMainBinding
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
 
     private var shopListAdapter = ShopListAdapter()
+    private var isLandscapeMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        isLandscapeMode = binding.shopItemContainer != null
 
         setupRecyclerView()
 
@@ -27,8 +32,20 @@ class MainActivity : ComponentActivity() {
         }
 
         binding.buttonAddShopItem.setOnClickListener {
-            startActivity(ShopItemActivity.newIntentAddItem(this))
+            if (isLandscapeMode) {
+                launchFragment(ShopItemFragment.newInstanceAddItem())
+            } else {
+                startActivity(ShopItemActivity.newIntentAddItem(this))
+            }
         }
+    }
+
+    private fun launchFragment(fragment: Fragment) {
+        supportFragmentManager.popBackStack()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.shop_item_container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun setupRecyclerView() {
@@ -49,7 +66,11 @@ class MainActivity : ComponentActivity() {
 
     private fun setupListeners() {
         shopListAdapter.onShopItemClickListener = {
-            startActivity(ShopItemActivity.newIntentEditItem(this, it.id))
+            if (isLandscapeMode) {
+                launchFragment(ShopItemFragment.newInstanceEditItem(it.id))
+            } else {
+                startActivity(ShopItemActivity.newIntentEditItem(this, it.id))
+            }
         }
         shopListAdapter.onShopItemLongClickListener = {
             viewModel.changeEnableState(it)

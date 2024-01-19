@@ -25,13 +25,19 @@ class ShopItemActivity : FragmentActivity() {
 
         parseIntent()
 
+        if (savedInstanceState == null) {
+            launchFragment()
+        }
+    }
+
+    private fun launchFragment() {
         val fragment = when (screenMode) {
             MODE_ADD -> ShopItemFragment.newInstanceAddItem()
             MODE_EDIT -> ShopItemFragment.newInstanceEditItem(shopItemId)
             else -> throw RuntimeException("Unknown screen mode $screenMode")
         }
         supportFragmentManager.beginTransaction()
-            .add(R.id.shop_item_container, fragment)
+            .replace(R.id.shop_item_container, fragment)
             .commit()
     }
 
