@@ -14,7 +14,10 @@ import com.example.shoppinglist.domain.ShopItem
 
 class ShopItemFragment : Fragment() {
 
-    private lateinit var binding: FragmentShopItemBinding
+    private var _binding: FragmentShopItemBinding? = null
+    private val binding : FragmentShopItemBinding
+        get() = _binding ?: throw RuntimeException("FragmentShopItemBinding == null")
+
     private lateinit var viewModel: ShopItemViewModel
     private lateinit var onEditingFinishedListener: OnEditingFinishedListener
 
@@ -40,7 +43,7 @@ class ShopItemFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentShopItemBinding.inflate(layoutInflater, container, false)
+        _binding = FragmentShopItemBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 
@@ -55,6 +58,11 @@ class ShopItemFragment : Fragment() {
         viewModel.shouldCloseScreen.observeForever {
             onEditingFinishedListener.onEditingFinished()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun launchAddMode() {
